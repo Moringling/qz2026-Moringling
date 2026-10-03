@@ -15,6 +15,11 @@ def test_add_get():
     assert man.get_user(1) == {"id": 1, "name": "Alice", "age": 18 }
     assert man.get_user(2) == {"id": 2, "name": "Bob", "age": 42 }
 
+def test_get_nonexistent_user():
+    man = UserManager()
+    man.add_user("Alice", 18)
+    assert man.get_user(18) is None
+
 def test_update_age():
     man = UserManager()
     id = man.add_user("Alice", 18)["id"]
