@@ -18,10 +18,13 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
+from articles import views as article_views
+
 from blog import settings
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("accounts/register/", article_views.register, name="register"),
     path("accounts/", include("django.contrib.auth.urls")),
     path("", include("articles.urls")),
 ]

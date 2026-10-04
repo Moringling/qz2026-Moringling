@@ -9,6 +9,6 @@
     {{ form.as_p }}
     <button class="btn" type="submit">登录</button>
   </form>
-  <p class="muted">没有账号？使用 <code>python manage.py createsuperuser</code> 创建。</p>
+  <p class="muted">没有账号？<a href="{% url 'register' %}">立即注册</a>，或使用 <code>python manage.py createsuperuser</code> 创建管理员。</p>
 </div>
 {% endblock %}

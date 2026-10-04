@@ -10,10 +10,20 @@ from django.http.response import HttpResponse, Http404, FileResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.http import require_POST
 
-from .forms import ArticleForm, AttachmentForm
+from .forms import ArticleForm, AttachmentForm, RegisterForm
 from .models import Article, Attachment, AuditLog
 from .utils import generate_thumbnail
 
+def register(request):
+    if request.method == "POST":
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "注册成功，请登录。")
+            return redirect("login")
+    else:
+        form = RegisterForm()
+    return render(request, "registration/register.html", {"form": form})
 
 def article_list(request: HttpRequest) -> HttpResponse:
     articles = (
