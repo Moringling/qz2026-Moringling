@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}统计{% endblock %}
+{% block content %}
+<h1>统计面板</h1>
+
+<div class="card">
+  <p>总文章数：<strong>{{ total_articles }}</strong></p>
+  <p>总浏览量：<strong>{{ total_views }}</strong></p>
+</div>
+
+<div class="card">
+  <h2>各状态文章数</h2>
+  <table>
+    <thead><tr><th>状态</th><th>数量</th></tr></thead>
+    <tbody>
+      {% for row in status_counts %}
+        <tr><td>{{ row.label }}</td><td>{{ row.count }}</td></tr>
+      {% empty %}
+        <tr><td colspan="2" class="muted">暂无数据</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="card">
+  <h2>最近 10 条审计日志</h2>
+  <table>
+    <thead><tr><th>时间</th><th>操作</th><th>文章</th><th>操作人</th><th>变更</th></tr></thead>
+    <tbody>
+      {% for log in recent_logs %}
+        <tr>
+          <td>{{ log.timestamp|date:"Y-m-d H:i:s" }}</td>
+          <td>{{ log.get_action_display }}</td>
+          <td>{{ log.article.title|default:"（已删除）" }}</td>
+          <td>{{ log.user.username|default:"—" }}</td>
+          <td><pre>{{ log.changes }}</pre></td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="5" class="muted">暂无日志</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

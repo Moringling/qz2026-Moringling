@@ -3,6 +3,8 @@ import os.path
 from django.conf import settings
 from django.db import models
 from django.db.models import Model
+from django.urls import reverse
+
 
 def attachment_upload_path(instance, filename):
     return os.path.join("attachments", str(instance.article.id), filename)
@@ -33,11 +35,15 @@ class Article(Model):
     def __str__(self) -> str:
         return self.title
 
+    def get_url(self):
+        return reverse("articles:detail", args=[self.pk])
+
 class Attachment(Model):
     article = models.ForeignKey(Article, on_delete=models.CASCADE, related_name="attachments", verbose_name="文章")
     filename = models.CharField("文件名", max_length=255)
     file = models.FileField("文件", upload_to=attachment_upload_path)
     thumbnail = models.ImageField("缩略图", upload_to=thumbnail_upload_path, blank=True,null=True)
+    downloads = models.PositiveIntegerField("下载次数", default=0)
     uploaded_at = models.DateTimeField("上传时间", auto_now_add=True)
 
     class Meta:
