@@ -28,6 +28,13 @@
 pip install -r requirements.txt
 ```
 
+### 数据库迁移
+
+```shell
+python manage.py makemigrations
+python manage.py migrate
+```
+
 ### 运行方式
 
 ```shell
