@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save, pre_delete
+from django.db.models.signals import post_save, pre_delete, pre_save
 from django.dispatch.dispatcher import receiver
 
 from articles.middleware import get_current_user
@@ -6,13 +6,13 @@ from articles.models import Article, AuditLog
 
 TRACKED_FIELDS = ("title", "body", "status", "is_deleted")
 
-@receiver
+@receiver(pre_save, sender=Article)
 def capture_old_article_state(sender, instance, **kwargs):
     if not instance.pk:
         instance._old_state = None
         return
     try:
-        instance._old_state = sender.objectst.get(pk=instance.pk)
+        instance._old_state = sender.objects.get(pk=instance.pk)
     except sender.DoesNotExist:
         instance._old_state = None
 
