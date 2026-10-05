@@ -1,4 +1,4 @@
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_delete
 from django.dispatch.dispatcher import receiver
 
 from articles.middleware import get_current_user
@@ -58,4 +58,13 @@ def log_article_save(sender, instance, created, **kwargs):
         user=get_current_user(),
         action=action,
         changes=changes
+    )
+
+@receiver(pre_delete, sender=Article)
+def log_article_delete(sender, instance, **kwargs):
+    AuditLog.objects.create(
+        article=None,
+        user=get_current_user(),
+        action=AuditLog.Action.DELETE,
+        changes={field: {"old": getattr(instance, field), "new": None} for field in TRACKED_FIELDS},
     )
