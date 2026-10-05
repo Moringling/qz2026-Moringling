@@ -12,7 +12,7 @@
 
 1. 数据模型：`Article`, `Attachment`, `AuditLog`
 2. 附件管理
-3. 操作审计：Django 新号驱动
+3. 操作审计：Django 信号驱动
 4. 浏览量计数：并发安全
 5. 封面图缩略图：上传附件会自动生成200px宽的缩略图。相关代码见 `articles/utils.py`
 6. 文章统计视图：`/stats/`
