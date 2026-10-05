@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% block title %}{{ article.title }}{% endblock %}
+{% block content %}
+<article class="card">
+  <h1>{{ article.title }}</h1>
+  <p class="muted">
+    作者：{{ article.author.username }} ·
+    <span class="badge {{ article.status }}">{{ article.get_status_display }}</span> ·
+    浏览 {{ article.views }} ·
+    创建于 {{ article.created_at|date:"Y-m-d H:i" }} ·
+    更新于 {{ article.updated_at|date:"Y-m-d H:i" }}
+  </p>
+  <div>{{ article.body|linebreaks }}</div>
+
+  {% if is_author %}
+    <p>
+      <a class="btn secondary" href="{% url 'articles:update' article.pk %}">编辑</a>
+      {% if article.status != 'published' %}
+        <form action="{% url 'articles:publish' article.pk %}" method="post" style="display:inline;">
+          {% csrf_token %}<button class="btn" type="submit">发布</button>
+        </form>
+      {% endif %}
+      {% if article.status != 'archived' %}
+        <form action="{% url 'articles:archive' article.pk %}" method="post" style="display:inline;">
+          {% csrf_token %}<button class="btn secondary" type="submit">归档</button>
+        </form>
+      {% endif %}
+      <form action="{% url 'articles:delete' article.pk %}" method="post" style="display:inline;"
+            onsubmit="return confirm('确认删除（软删除）？');">
+        {% csrf_token %}<button class="btn danger" type="submit">删除</button>
+      </form>
+    </p>
+  {% endif %}
+</article>
+
+<section class="card">
+  <h2>附件</h2>
+  {% if attachments %}
+    <table>
+      <thead><tr><th>文件</th><th>缩略图</th><th>下载</th><th>操作</th></tr></thead>
+      <tbody>
+      {% for attachment in attachments %}
+        <tr>
+          <td>
+            <a href="{{ attachment.file.url }}" target="_blank" rel="noopener">
+              {{ attachment.filename|default:attachment.file.name }}
+            </a>
+          </td>
+          <td>
+            {% if attachment.thumbnail %}
+              <img class="thumb" src="{{ attachment.thumbnail.url }}" alt="{{ attachment.filename }} 的缩略图">
+            {% elif attachment.is_image %}
+              <!-- 图片但缩略图生成失败时，直接展示原图 -->
+              <img class="thumb" src="{{ attachment.file.url }}" alt="{{ attachment.filename }}">
+            {% else %}—{% endif %}
+          </td>
+          <td>{{ attachment.downloads }}</td>
+          <td>
+            <a class="btn small" href="{% url 'articles:attachment_download' attachment.pk %}">下载</a>
+            {% if is_author %}
+              <form action="{% url 'articles:attachment_delete' attachment.pk %}" method="post" style="display:inline;"
+                    onsubmit="return confirm('确认删除该附件？');">
+                {% csrf_token %}<button class="btn danger small" type="submit">删除</button>
+              </form>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="muted">暂无附件。</p>
+  {% endif %}
+
+  {% if is_author %}
+    <h3>上传附件</h3>
+    <form action="{% url 'articles:attachment_upload' article.pk %}" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ attachment_form.as_p }}
+      <button class="btn" type="submit">上传</button>
+    </form>
+  {% endif %}
+</section>
+
+<section class="card">
+  <h2>审计日志</h2>
+  {% if audit_logs %}
+    <table>
+      <thead><tr><th>时间</th><th>操作</th><th>操作人</th><th>变更摘要</th></tr></thead>
+      <tbody>
+      {% for log in audit_logs %}
+        <tr>
+          <td>{{ log.timestamp|date:"Y-m-d H:i:s" }}</td>
+          <td>{{ log.get_action_display }}</td>
+          <td>{{ log.user.username|default:"—" }}</td>
+          <td><pre>{{ log.changes }}</pre></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="muted">暂无审计日志。</p>
+  {% endif %}
+</section>
+{% endblock %}

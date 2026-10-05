@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}文章列表{% endblock %}
+{% block content %}
+<h1>文章列表</h1>
+<p class="muted">草稿不会被他人看到，但为便于演示，这里展示全部未删除文章。</p>
+
+{% for article in articles %}
+  <div class="card">
+    <h2><a href="{{ article.get_url }}">{{ article.title }}</a></h2>
+    <p class="muted">
+      作者：{{ article.author.username }} ·
+      <span class="badge {{ article.status }}">{{ article.get_status_display }}</span> ·
+      浏览 {{ article.views }} · 附件 {{ article.attachment_count }} ·
+      {{ article.created_at|date:"Y-m-d H:i" }}
+    </p>
+  </div>
+{% empty %}
+  <div class="card">还没有文章。{% if user.is_authenticated %}<a href="{% url 'articles:create' %}">写一篇</a>{% endif %}</div>
+{% endfor %}
+{% endblock %}
